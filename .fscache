@@ -1,2 +1,8 @@
-::res://::1429349308
+::res://::1429352541
 icon.png::ImageTexture::1429349308::
+::res://Level1::1429352688
+Level1.scn::PackedScene::1429352688::
+::res://Player::1429352614
+Player.gd::GDScript::1429352305::
+Player.scn::PackedScene::1429352614::
+PlayerBase.png::ImageTexture::1429349703::
