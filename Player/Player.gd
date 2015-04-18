@@ -37,9 +37,8 @@ func _fixed_process(delta):
 	if Input.is_action_pressed("teleport") && teleportCooldownCurrent <= 0:
 		teleportCooldownCurrent = teleportCooldown
 		var teleportDirection = globalAimPos - get_global_pos()
-		print(teleportDirection)
 		teleportDirection = teleportDirection.normalized()
-		print(teleportDirection)
+		#raycast to check if we can teleport to specified position.
 		var space = get_world_2d().get_space()
 		var space_state = Physics2DServer.space_get_direct_state( space )
 		var endPoint = get_global_pos() + teleportDirection * teleportLength
@@ -54,7 +53,7 @@ func _fixed_process(delta):
 		var bodies = get_node("HackHitBox").get_overlapping_bodies()
 		for body in bodies:
 			if body extends enemyClass:
-				body.hack()
+				body.hack(self)
 		
 func _input(ev):
 	if(ev.type == InputEvent.MOUSE_MOTION):
