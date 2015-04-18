@@ -31,31 +31,20 @@ func _fixed_process(delta):
 					if(intersectResult.has("collision")):
 						print("I see enemy")
 		elif observed extends playerClass:
-			_shoot(observed.get_global_pos())
-			
-			#RAYCAST WITH NODE
-			var raycast = get_node("RayCast2D")
-			raycast.set_cast_to( get_global_transform().xform(observed.get_global_pos()) )
-			#print( get_global_transform().xform(observed.get_global_pos()) )
-			if (raycast.is_colliding() && raycast.get_collider() == observed):
-				print("Collision!")
-				
-			#RAYCAST WITH CODE
 			var space = get_world_2d().get_space()
 			var physWorld = Physics2DServer.space_get_direct_state( space )
-			#print (get_global_pos(), observed.get_global_pos())
-			var intersectResult = physWorld.intersect_ray(get_global_pos(), observed.get_global_pos(), [self])
-			#print (intersectResult)
+			var vector = observed.get_global_pos() - get_global_pos()
+			vector *= 10 #WORKAROUND
+			var intersectResult = physWorld.intersect_ray(get_global_pos(), get_global_pos()+vector, [self])
 			oldIntersect = intersectResult
 			update()
 			if(intersectResult.has("collider") and intersectResult["collider"] == observed):
-				#print("I see player ", intersectResult["position"] )
-				#_shoot(intersectResult["position"])
+				_shoot(observed.get_global_pos())
 	pass
 	
 func _draw():
 	if(oldIntersect != null && oldIntersect.has("position")):
-		draw_line(get_global_pos(), oldIntersect["position"], Color(1,1,1))
+		draw_line( get_global_transform().xform_inv(get_global_pos()),  get_global_transform().xform_inv(oldIntersect["position"]), Color(1,1,1))
 	
 func hack(var hacker):
 	owner = hacker
