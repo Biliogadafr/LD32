@@ -32,11 +32,20 @@ func _fixed_process(delta):
 						print("I see enemy")
 		elif observed extends playerClass:
 			_shoot(observed.get_global_pos())
+			
+			#RAYCAST WITH NODE
+			var raycast = get_node("RayCast2D")
+			raycast.set_cast_to( get_global_transform().xform(observed.get_global_pos()) )
+			#print( get_global_transform().xform(observed.get_global_pos()) )
+			if (raycast.is_colliding() && raycast.get_collider() == observed):
+				print("Collision!")
+				
+			#RAYCAST WITH CODE
 			var space = get_world_2d().get_space()
 			var physWorld = Physics2DServer.space_get_direct_state( space )
-			print (get_global_pos(), observed.get_global_pos())
+			#print (get_global_pos(), observed.get_global_pos())
 			var intersectResult = physWorld.intersect_ray(get_global_pos(), observed.get_global_pos(), [self])
-			print (intersectResult)
+			#print (intersectResult)
 			oldIntersect = intersectResult
 			update()
 			if(intersectResult.has("collider") and intersectResult["collider"] == observed):
