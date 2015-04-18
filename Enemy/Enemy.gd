@@ -6,11 +6,13 @@ extends RigidBody2D
 # var b="textvar"
 
 const playerClass = preload("res://Player/Player.gd") # cache the enemy class
+var bullet = preload("res://assets/Bullet.scn") # will load when parsing the script
 
 var isHacked = false
 var owner
 
-export var shootCooldown = 0.5
+export var shootCooldown = 0.2
+export var bulletImpulse = 200
 var shootCooldownRemain = shootCooldown
 var oldIntersect 
 func _ready():
@@ -27,7 +29,7 @@ func _fixed_process(delta):
 				if(!observed.isHacked):
 					var space = get_world_2d().get_space()
 					var physWorld = Physics2DServer.space_get_direct_state( space )
-					var intersectResult = physWorld.intersect_ray(get_global_pos(), observed.get_global_pos(), [self])
+					var intersectResult = physWorld.intersect_ray(get_global_pos(), observed.get_global_pos(), [self], 1)
 					if(intersectResult.has("collision")):
 						print("I see enemy")
 		elif observed extends playerClass:
@@ -35,7 +37,7 @@ func _fixed_process(delta):
 			var physWorld = Physics2DServer.space_get_direct_state( space )
 			var vector = observed.get_global_pos() - get_global_pos()
 			vector *= 10 #WORKAROUND
-			var intersectResult = physWorld.intersect_ray(get_global_pos(), get_global_pos()+vector, [self])
+			var intersectResult = physWorld.intersect_ray(get_global_pos(), get_global_pos()+vector, [self], 1)
 			oldIntersect = intersectResult
 			update()
 			if(intersectResult.has("collider") and intersectResult["collider"] == observed):
@@ -55,5 +57,13 @@ func hack(var hacker):
 func _shoot(var target):
 	if(shootCooldownRemain < 0):
 		print("shoot", target)
+		var bulletInst = bullet.instance()
+		get_owner().add_child(bulletInst)
+		var shootDir = (target - get_global_pos()).normalized()
+		var shootPos = get_global_pos()
+		shootPos += shootDir * 20
+		bulletInst.set_global_pos(shootPos)
+		bulletInst.get_node("RigidBody2D").apply_impulse(Vector2(0,0), shootDir * bulletImpulse)
+		bulletInst.set_rot(shootPos.angle_to_point(target))
 		shootCooldownRemain = shootCooldown
 	
