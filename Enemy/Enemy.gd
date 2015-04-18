@@ -21,6 +21,7 @@ func _fixed_process(delta):
 	shootCooldownRemain -= delta;
 	var fov = get_node("FieldOfView")
 	var observedObjects = fov.get_overlapping_bodies()
+	var target = null
 	for observed in observedObjects:
 		if isHacked:
 			if observed != self and observed extends get_script():
@@ -33,8 +34,7 @@ func _fixed_process(delta):
 					oldIntersect = intersectResult
 					update()
 					if(intersectResult.has("collider") && intersectResult["collider"] == observed):
-						print("I see enemy")
-						_shoot(observed.get_global_pos())
+						target = observed
 						break
 		elif observed extends playerClass || (observed extends get_script() && observed.isHacked):
 			var space = get_world_2d().get_space()
@@ -45,7 +45,10 @@ func _fixed_process(delta):
 			oldIntersect = intersectResult
 			update()
 			if(intersectResult.has("collider") and intersectResult["collider"] == observed):
-				_shoot(observed.get_global_pos())
+				target = observed
+	if target != null:
+		set_rot(get_global_pos().angle_to_point(target.get_global_pos()))
+		_shoot(target.get_global_pos())
 	pass
 	
 func _draw():
