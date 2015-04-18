@@ -1,12 +1,9 @@
 
 extends RigidBody2D
 
-# member variables here, example:
-# var a=2
-# var b="textvar"
-
 const playerClass = preload("res://Player/Player.gd") # cache the enemy class
 var bullet = preload("res://assets/Bullet.scn") # will load when parsing the script
+const bulletClass = preload("res://assets/Bullet.gd") # will load when parsing the script
 
 var isHacked = false
 var owner
@@ -17,6 +14,7 @@ var shootCooldownRemain = shootCooldown
 var oldIntersect 
 func _ready():
 	set_fixed_process(true)
+	connect("body_enter", self, "onCollision")
 	pass
 	
 func _fixed_process(delta):
@@ -29,15 +27,21 @@ func _fixed_process(delta):
 				if(!observed.isHacked):
 					var space = get_world_2d().get_space()
 					var physWorld = Physics2DServer.space_get_direct_state( space )
-					var intersectResult = physWorld.intersect_ray(get_global_pos(), observed.get_global_pos(), [self], 1)
-					if(intersectResult.has("collision")):
+					var rayVector = observed.get_global_pos() - get_global_pos()
+					rayVector *= 10 #WORKAROUND
+					var intersectResult = physWorld.intersect_ray(get_global_pos(), get_global_pos()+rayVector, [self], 1)
+					oldIntersect = intersectResult
+					update()
+					if(intersectResult.has("collider") && intersectResult["collider"] == observed):
 						print("I see enemy")
-		elif observed extends playerClass:
+						_shoot(observed.get_global_pos())
+						break
+		elif observed extends playerClass || (observed extends get_script() && observed.isHacked):
 			var space = get_world_2d().get_space()
 			var physWorld = Physics2DServer.space_get_direct_state( space )
-			var vector = observed.get_global_pos() - get_global_pos()
-			vector *= 10 #WORKAROUND
-			var intersectResult = physWorld.intersect_ray(get_global_pos(), get_global_pos()+vector, [self], 1)
+			var rayVector = observed.get_global_pos() - get_global_pos()
+			rayVector *= 10 #WORKAROUND
+			var intersectResult = physWorld.intersect_ray(get_global_pos(), get_global_pos()+rayVector, [self], 1)
 			oldIntersect = intersectResult
 			update()
 			if(intersectResult.has("collider") and intersectResult["collider"] == observed):
@@ -48,6 +52,10 @@ func _draw():
 	if(oldIntersect != null && oldIntersect.has("position")):
 		draw_line( get_global_transform().xform_inv(get_global_pos()),  get_global_transform().xform_inv(oldIntersect["position"]), Color(1,1,1))
 	
+func onCollision(var collider):
+	if collider extends bulletClass:
+		get_parent().queue_free()
+
 func hack(var hacker):
 	owner = hacker
 	if !isHacked:
