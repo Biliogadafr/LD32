@@ -12,6 +12,8 @@ export var shootCooldown = 0.2
 export var bulletImpulse = 200
 var shootCooldownRemain = shootCooldown
 var oldIntersect 
+var distance = 100
+var walkSpeed = 100
 func _ready():
 	set_fixed_process(true)
 	connect("body_enter", self, "onCollision")
@@ -49,6 +51,12 @@ func _fixed_process(delta):
 	if target != null:
 		set_rot(get_global_pos().angle_to_point(target.get_global_pos()))
 		_shoot(target.get_global_pos())
+	elif isHacked:
+		var direction = owner.get_global_pos() - get_global_pos()
+		if(direction.length() > distance):
+			direction = direction.normalized()
+			set_linear_velocity(direction*walkSpeed)
+			set_rot(get_global_pos().angle_to_point(owner.get_global_pos()))
 	pass
 	
 func _draw():
