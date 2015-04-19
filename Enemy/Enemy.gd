@@ -74,14 +74,14 @@ func _fixed_process(delta):
 	#	lastTargetPos = target.get_global_pos()
 	
 	if target != null:
-		set_rot(get_global_pos().angle_to_point(target.get_global_pos()))
+		set_rot(get_global_pos().angle_to_point(target.get_global_pos()) - get_owner().get_rot())
 		_shoot(target.get_global_pos())
 	elif isHacked:
 		var direction = owner.get_global_pos() - get_global_pos()
 		if(direction.length() > distance):
 			direction = direction.normalized()
 			set_linear_velocity(direction*walkSpeed)
-			set_rot(get_global_pos().angle_to_point(owner.get_global_pos()))
+			set_rot(get_global_pos().angle_to_point(owner.get_global_pos()) -get_owner().get_rot()) #pffffff.....
 	else:
 		#go to last target location   # nah... don't want to organize state machine... I'm tired with trying to make raycasts work ... 
 		if(target == null && lastTargetPos != null):
@@ -89,7 +89,7 @@ func _fixed_process(delta):
 			if(direction.length() > 10):
 				direction = direction.normalized()
 				set_linear_velocity(direction*walkSpeed)
-				set_rot(get_global_pos().angle_to_point(lastTargetPos))
+				set_rot(get_global_pos().angle_to_point(lastTargetPos)-get_owner().get_rot())
 			else:
 				lastTargetPos = null
 			
@@ -124,7 +124,7 @@ func _shoot(var target):
 	if(shootCooldownRemain < 0):
 		print("shoot", target)
 		var bulletInst = bullet.instance()
-		get_owner().add_child(bulletInst)
+		get_tree().get_root().add_child(bulletInst)
 		var shootDir = (target - get_global_pos()).normalized()
 		var shootPos = get_global_pos()
 		shootPos += shootDir * 20

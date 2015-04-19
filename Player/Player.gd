@@ -11,7 +11,7 @@ export var speed = 0.0
 var lastPos = Vector2(0,0)
 
 export var teleportCooldown = 0.3;
-export var teleportLength = 100;
+export var teleportLength = 1200;
 var teleportCooldownCurrent = teleportCooldown;
 var animations
 
@@ -50,10 +50,13 @@ func _fixed_process(delta):
 		#raycast to check if we can teleport to specified position.
 		var space = get_world_2d().get_space()
 		var space_state = Physics2DServer.space_get_direct_state( space )
-		var endPoint = get_global_pos() + teleportDirection * teleportLength
-		var intersectResult = space_state.intersect_ray(get_global_pos(), endPoint, [self])
+		var endPoint = get_global_pos() + teleportDirection * teleportLength    
+		#*20 is workaround... kind of... anyway don't work.
+		var intersectResult = space_state.intersect_ray(get_global_pos(),  get_global_pos() + teleportDirection * teleportLength*20, [self])
 		if intersectResult.has("position"):
-			endPoint = intersectResult["position"]
+			var endPointCandidate = intersectResult["position"]
+			if (endPointCandidate - get_global_pos()).length() < teleportLength:
+				endPoint = endPointCandidate
 		set_global_pos(endPoint)
 	else:
 		teleportCooldownCurrent -= delta
