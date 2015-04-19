@@ -13,17 +13,18 @@ var lastPos = Vector2(0,0)
 export var teleportCooldown = 0.3;
 export var teleportLength = 100;
 var teleportCooldownCurrent = teleportCooldown;
+var animations
 
 func _ready():
 	print("hello 3")
 	set_process_input(true)
 	set_fixed_process(true)
+	animations = get_node("AnimationPlayer")
 	pass
 	
 func _fixed_process(delta):
 	#aiming
 	var globalAimPos = get_node("Camera2D").get_canvas_transform().xform_inv(lastPos)
-	set_rot( get_global_pos().angle_to_point( globalAimPos ) )
 	#moving
 	var move_left = Input.is_action_pressed("move_left")
 	var move_right = Input.is_action_pressed("move_right")
@@ -33,6 +34,14 @@ func _fixed_process(delta):
 	direction = direction.normalized()
 	direction*=delta*speed
 	set_linear_velocity(direction)
+	if(direction.length()==0):
+		set_rot( get_global_pos().angle_to_point( globalAimPos ) )
+		if(animations. get_current_animation() != "Base"):
+			animations.play("Base")
+	else:
+		set_rot( Vector2(0,-1).angle_to( direction ) )
+		if(animations. get_current_animation() != "Run"):
+			animations.play("Run")
 	#teleporting
 	if Input.is_action_pressed("teleport") && teleportCooldownCurrent <= 0:
 		teleportCooldownCurrent = teleportCooldown
