@@ -66,18 +66,9 @@ func _fixed_process(delta):
 				lastTargetPos = target.get_global_pos()
 				targetLock = target #workaround
 				break
-	
-	#go to last target location   # nah... don't want to organize state machine... I'm tired with trying to make raycasts work ... 
+				
 	if(target == null):
 		targetLock = null #workaround
-		if (lastTargetPos != null):
-			var direction = lastTargetPos - get_global_pos()
-			if(direction.length() > 10):
-				direction = direction.normalized()
-				set_linear_velocity(direction*walkSpeed)
-				set_rot(get_global_pos().angle_to_point(lastTargetPos))
-			else:
-				lastTargetPos = null
 		
 	#if(target != null):
 	#	lastTargetPos = target.get_global_pos()
@@ -91,6 +82,16 @@ func _fixed_process(delta):
 			direction = direction.normalized()
 			set_linear_velocity(direction*walkSpeed)
 			set_rot(get_global_pos().angle_to_point(owner.get_global_pos()))
+	else:
+		#go to last target location   # nah... don't want to organize state machine... I'm tired with trying to make raycasts work ... 
+		if(target == null && lastTargetPos != null):
+			var direction = lastTargetPos - get_global_pos()
+			if(direction.length() > 10):
+				direction = direction.normalized()
+				set_linear_velocity(direction*walkSpeed)
+				set_rot(get_global_pos().angle_to_point(lastTargetPos))
+			else:
+				lastTargetPos = null
 			
 	#ANIMATION
 	if(shootCooldownRemain > -shootCooldown):
