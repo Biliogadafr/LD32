@@ -6,7 +6,7 @@ export var lifeTimer = 5.0
 func _ready():
 	# Initialization here
 	connect("body_enter", self, "onCollision")
-	print("create bullet")
+	#print("create bullet")
 	set_fixed_process(true)
 	pass
 	
@@ -17,5 +17,5 @@ func _fixed_process(delta):
 	pass
 
 func onCollision(var obj):
-	print ("collide")
+	#print ("collide")
 	get_parent().queue_free()

@@ -6,20 +6,23 @@ extends RigidBody2D
 # var b="textvar"
 
 const enemyClass = preload("res://Enemy/Enemy.gd")
+const bulletClass = preload("res://assets/Bullet.gd") # bullet class to check collision
 
 export var speed = 0.0
 var lastPos = Vector2(0,0)
 
 export var teleportCooldown = 0.3;
-export var teleportLength = 1200;
+export var teleportLength = 120;
 var teleportCooldownCurrent = teleportCooldown;
 var animations
+var health = 100
 
 func _ready():
 	print("hello 3")
 	set_process_input(true)
 	set_fixed_process(true)
 	animations = get_node("AnimationPlayer")
+	connect("body_enter", self, "onCollision")
 	pass
 	
 func _fixed_process(delta):
@@ -66,6 +69,13 @@ func _fixed_process(delta):
 		for body in bodies:
 			if body extends enemyClass:
 				body.hack(self)
+	
+	if health <= 0 :
+		get_parent().queue_free()
+		
+func onCollision(var collider):
+	if collider extends bulletClass:
+		health -= 20
 		
 func _input(ev):
 	if(ev.type == InputEvent.MOUSE_MOTION):

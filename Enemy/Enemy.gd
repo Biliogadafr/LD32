@@ -122,7 +122,7 @@ func hack(var hacker):
 		
 func _shoot(var target):
 	if(shootCooldownRemain < 0):
-		print("shoot", target)
+		#print("shoot", target)
 		var bulletInst = bullet.instance()
 		get_tree().get_root().add_child(bulletInst)
 		var shootDir = (target - get_global_pos()).normalized()
