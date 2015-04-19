@@ -20,6 +20,8 @@ var animations
 
 var targetLock = null #need to remember target because of problems with raycast
 
+var lastTargetPos = null
+
 func _ready():
 	set_fixed_process(true)
 	connect("body_enter", self, "onCollision")
@@ -46,6 +48,7 @@ func _fixed_process(delta):
 						target = targetLock
 					if(intersectResult.has("collider") && intersectResult["collider"] == observed):
 						target = observed
+						lastTargetPos = target.get_global_pos()
 						targetLock = target #workaround
 						break
 		elif observed extends playerClass || (observed extends get_script() && observed.isHacked):
@@ -60,10 +63,24 @@ func _fixed_process(delta):
 				target = targetLock
 			if(intersectResult.has("collider") and intersectResult["collider"] == observed):
 				target = observed
+				lastTargetPos = target.get_global_pos()
 				targetLock = target #workaround
+				break
 	
-	if(target == null): #workaround
-		targetLock = null
+	#go to last target location   # nah... don't want to organize state machine... I'm tired with trying to make raycasts work ... 
+	if(target == null):
+		targetLock = null #workaround
+		if (lastTargetPos != null):
+			var direction = lastTargetPos - get_global_pos()
+			if(direction.length() > 10):
+				direction = direction.normalized()
+				set_linear_velocity(direction*walkSpeed)
+				set_rot(get_global_pos().angle_to_point(lastTargetPos))
+			else:
+				lastTargetPos = null
+		
+	#if(target != null):
+	#	lastTargetPos = target.get_global_pos()
 	
 	if target != null:
 		set_rot(get_global_pos().angle_to_point(target.get_global_pos()))
@@ -74,6 +91,8 @@ func _fixed_process(delta):
 			direction = direction.normalized()
 			set_linear_velocity(direction*walkSpeed)
 			set_rot(get_global_pos().angle_to_point(owner.get_global_pos()))
+			
+	#ANIMATION
 	if(shootCooldownRemain > -shootCooldown):
 		if(animations. get_current_animation() != "Shoot"):
 			animations.play("Shoot")
