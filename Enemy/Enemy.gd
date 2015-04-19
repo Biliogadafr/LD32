@@ -1,9 +1,10 @@
 
 extends RigidBody2D
 
-const playerClass = preload("res://Player/Player.gd") # cache the enemy class
-var bullet = preload("res://assets/Bullet.scn") # will load when parsing the script
-const bulletClass = preload("res://assets/Bullet.gd") # will load when parsing the script
+const playerClass = preload("res://Player/Player.gd") # Check if we see player
+var bullet = preload("res://assets/Bullet.scn") # bullet scn to make instance and shoot
+const bulletClass = preload("res://assets/Bullet.gd") # bullet class to check collision
+const hackedTex = preload("res://Enemy/HeadH.png") # texture for hacked head
 
 var isHacked = false
 var owner
@@ -14,9 +15,13 @@ var shootCooldownRemain = shootCooldown
 var oldIntersect 
 var distance = 100
 var walkSpeed = 100
+
+var animations
+
 func _ready():
 	set_fixed_process(true)
 	connect("body_enter", self, "onCollision")
+	animations = get_node("AnimationPlayer")
 	pass
 	
 func _fixed_process(delta):
@@ -57,6 +62,15 @@ func _fixed_process(delta):
 			direction = direction.normalized()
 			set_linear_velocity(direction*walkSpeed)
 			set_rot(get_global_pos().angle_to_point(owner.get_global_pos()))
+	if(shootCooldownRemain > -shootCooldown):
+		if(animations. get_current_animation() != "Shoot"):
+			animations.play("Shoot")
+	elif(get_linear_velocity().length()>walkSpeed/2):
+		if(animations. get_current_animation() != "Run"):
+			animations.play("Run")
+	else:
+		if(animations. get_current_animation() != "Look"):
+			animations.play("Look")
 	pass
 	
 func _draw():
@@ -70,6 +84,7 @@ func onCollision(var collider):
 func hack(var hacker):
 	owner = hacker
 	if !isHacked:
+		get_node("Skin/Head").set_texture(hackedTex)
 		print("hacked")
 		isHacked = true
 		
