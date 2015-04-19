@@ -28,6 +28,8 @@ func _ready():
 	pass
 	
 func _fixed_process(delta):
+	get_tree().get_root().get_child( get_tree().get_root().get_child_count() -1 ).get_node("CanvasLayer/health").set_text(" Health: " + str(health))
+
 	if health <= 0 :
 		deathTimeout -= delta
 		if deathTimeout < 0:
