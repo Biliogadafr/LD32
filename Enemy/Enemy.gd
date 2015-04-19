@@ -2,7 +2,7 @@
 extends RigidBody2D
 
 const playerClass = preload("res://Player/Player.gd") # Check if we see player
-var bullet = preload("res://assets/Bullet.scn") # bullet scn to make instance and shoot
+var bullet = preload("res://assets/bullet.scn") # bullet scn to make instance and shoot
 const bulletClass = preload("res://assets/Bullet.gd") # bullet class to check collision
 const hackedTex = preload("res://Enemy/HeadH.png") # texture for hacked head
 
@@ -17,6 +17,8 @@ var distance = 100
 var walkSpeed = 100
 
 var animations
+
+var targetLock = null #need to remember target because of problems with raycast
 
 func _ready():
 	set_fixed_process(true)
@@ -36,23 +38,33 @@ func _fixed_process(delta):
 					var space = get_world_2d().get_space()
 					var physWorld = Physics2DServer.space_get_direct_state( space )
 					var rayVector = observed.get_global_pos() - get_global_pos()
-					rayVector *= 10 #WORKAROUND
+					rayVector *= 100 #WORKAROUND FOR RAYCAST BUG... DON"T WORK REALLY
 					var intersectResult = physWorld.intersect_ray(get_global_pos(), get_global_pos()+rayVector, [self], 1)
 					oldIntersect = intersectResult
 					update()
+					if(targetLock != null && observed == targetLock): #workaround
+						target = targetLock
 					if(intersectResult.has("collider") && intersectResult["collider"] == observed):
 						target = observed
+						targetLock = target #workaround
 						break
 		elif observed extends playerClass || (observed extends get_script() && observed.isHacked):
 			var space = get_world_2d().get_space()
 			var physWorld = Physics2DServer.space_get_direct_state( space )
 			var rayVector = observed.get_global_pos() - get_global_pos()
-			rayVector *= 10 #WORKAROUND
+			rayVector *= 100 #WORKAROUND... DON"T WORK REALLY
 			var intersectResult = physWorld.intersect_ray(get_global_pos(), get_global_pos()+rayVector, [self], 1)
 			oldIntersect = intersectResult
 			update()
+			if(targetLock != null && observed == targetLock): #workaround
+				target = targetLock
 			if(intersectResult.has("collider") and intersectResult["collider"] == observed):
 				target = observed
+				targetLock = target #workaround
+	
+	if(target == null): #workaround
+		targetLock = null
+	
 	if target != null:
 		set_rot(get_global_pos().angle_to_point(target.get_global_pos()))
 		_shoot(target.get_global_pos())
