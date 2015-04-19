@@ -3,6 +3,7 @@ extends RigidBody2D
 
 const playerClass = preload("res://Player/Player.gd") # Check if we see player
 var bullet = preload("res://assets/bullet.scn") # bullet scn to make instance and shoot
+var blood = preload("res://assets/blood.scn") # blood for death
 const bulletClass = preload("res://assets/Bullet.gd") # bullet class to check collision
 const hackedTex = preload("res://Enemy/HeadH.png") # texture for hacked head
 
@@ -111,6 +112,11 @@ func _draw():
 	
 func onCollision(var collider):
 	if collider extends bulletClass:
+		var bloodInst = blood.instance()
+		#insert blood to scene =/
+		get_tree().get_root().get_child( get_tree().get_root().get_child_count() -1 ).add_child(bloodInst)
+		bloodInst.set_pos(get_global_pos())
+		bloodInst.set_z(-1)
 		get_parent().queue_free()
 
 func hack(var hacker):
@@ -124,7 +130,7 @@ func _shoot(var target):
 	if(shootCooldownRemain < 0):
 		#print("shoot", target)
 		var bulletInst = bullet.instance()
-		get_tree().get_root().add_child(bulletInst)
+		get_tree().get_root().get_child( get_tree().get_root().get_child_count() -1 ).add_child(bulletInst)
 		var shootDir = (target - get_global_pos()).normalized()
 		var shootPos = get_global_pos()
 		shootPos += shootDir * 20

@@ -7,6 +7,7 @@ extends RigidBody2D
 
 const enemyClass = preload("res://Enemy/Enemy.gd")
 const bulletClass = preload("res://assets/Bullet.gd") # bullet class to check collision
+var blood = preload("res://assets/blood.scn") # blood for death
 
 export var speed = 0.0
 var lastPos = Vector2(0,0)
@@ -16,6 +17,7 @@ export var teleportLength = 120;
 var teleportCooldownCurrent = teleportCooldown;
 var animations
 var health = 100
+var deathTimeout = 1
 
 func _ready():
 	print("hello 3")
@@ -26,6 +28,12 @@ func _ready():
 	pass
 	
 func _fixed_process(delta):
+	if health <= 0 :
+		deathTimeout -= delta
+		if deathTimeout < 0:
+			get_node("/root/level_switcher").goto_scene("res://Level1/Level1.scn")
+		return
+
 	#aiming
 	var globalAimPos = get_node("Camera2D").get_canvas_transform().xform_inv(lastPos)
 	#moving
@@ -69,13 +77,22 @@ func _fixed_process(delta):
 		for body in bodies:
 			if body extends enemyClass:
 				body.hack(self)
-	
-	if health <= 0 :
-		get_parent().queue_free()
 		
 func onCollision(var collider):
 	if collider extends bulletClass:
 		health -= 20
+		if health <= 0 :
+			var bloodInst = blood.instance()
+			get_tree().get_root().get_child( get_tree().get_root().get_child_count() -1 ).add_child(bloodInst)
+			bloodInst.set_pos(get_global_pos())
+			bloodInst.set_z(-1)
+			#group your nodes or...
+			get_node("Head").set_opacity(0)
+			get_node("Torso").set_opacity(0)
+			get_node("Sprite").set_opacity(0)
+			get_node("lArm").set_opacity(0)
+			get_node("rArm").set_opacity(0)
+			set_linear_damp(10)
 		
 func _input(ev):
 	if(ev.type == InputEvent.MOUSE_MOTION):
