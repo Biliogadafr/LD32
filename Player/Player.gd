@@ -73,10 +73,13 @@ func _fixed_process(delta):
 		teleportCooldownCurrent -= delta
 	#hacking
 	if Input.is_action_pressed("hack"):
+		get_node("HackSpark").set_emitting(true)
 		var bodies = get_node("HackHitBox").get_overlapping_bodies()
 		for body in bodies:
 			if body extends enemyClass:
 				body.hack(self)
+	else:
+		get_node("HackSpark").set_emitting(false)
 		
 func onCollision(var collider):
 	if collider extends bulletClass:
