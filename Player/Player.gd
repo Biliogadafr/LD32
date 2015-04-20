@@ -89,7 +89,7 @@ func _fixed_process(delta):
 		
 func onCollision(var collider):
 	if collider extends bulletClass:
-		health -= 20
+		health -= 5
 		if health <= 0 :
 			var bloodInst = blood.instance()
 			get_tree().get_root().get_child( get_tree().get_root().get_child_count() -1 ).add_child(bloodInst)

@@ -107,8 +107,9 @@ func _fixed_process(delta):
 	pass
 	
 func _draw():
-	if(oldIntersect != null && oldIntersect.has("position")):
-		draw_line( get_global_transform().xform_inv(get_global_pos()),  get_global_transform().xform_inv(oldIntersect["position"]), Color(1,1,1))
+	pass
+	#if(oldIntersect != null && oldIntersect.has("position")):
+	#	draw_line( get_global_transform().xform_inv(get_global_pos()),  get_global_transform().xform_inv(oldIntersect["position"]), Color(1,1,1))
 	
 func onCollision(var collider):
 	if collider extends bulletClass:
