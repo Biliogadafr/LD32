@@ -73,6 +73,10 @@ func _fixed_process(delta):
 		set_global_pos(endPoint)
 	else:
 		teleportCooldownCurrent -= delta
+		if(teleportCooldownCurrent > 0):
+			get_node("TeleportSpark").set_emitting(true)
+		else:
+			get_node("TeleportSpark").set_emitting(false)
 	#hacking
 	if Input.is_action_pressed("hack"):
 		get_node("HackSpark").set_emitting(true)
