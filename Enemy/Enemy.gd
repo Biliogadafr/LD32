@@ -19,8 +19,6 @@ var walkSpeed = 100
 
 var animations
 
-var targetLock = null #need to remember target because of problems with raycast
-
 var lastTargetPos = null
 
 func _ready():
@@ -40,39 +38,24 @@ func _fixed_process(delta):
 				if(!observed.isHacked):
 					var space = get_world_2d().get_space()
 					var physWorld = Physics2DServer.space_get_direct_state( space )
-					var rayVector = observed.get_global_pos() - get_global_pos()
-					rayVector *= 100 #WORKAROUND FOR RAYCAST BUG... DON"T WORK REALLY
-					var intersectResult = physWorld.intersect_ray(get_global_pos(), get_global_pos()+rayVector, [self], 1)
+					var intersectResult = physWorld.intersect_ray(get_global_pos(), observed.get_global_pos(), [self], 1)
 					oldIntersect = intersectResult
 					update()
-					if(targetLock != null && observed == targetLock): #workaround
-						target = targetLock
 					if(intersectResult.has("collider") && intersectResult["collider"] == observed):
 						target = observed
 						lastTargetPos = target.get_global_pos()
-						targetLock = target #workaround
 						break
 		elif observed extends playerClass || (observed extends get_script() && observed.isHacked):
 			var space = get_world_2d().get_space()
 			var physWorld = Physics2DServer.space_get_direct_state( space )
-			var rayVector = observed.get_global_pos() - get_global_pos()
-			rayVector *= 100 #WORKAROUND... DON"T WORK REALLY
-			var intersectResult = physWorld.intersect_ray(get_global_pos(), get_global_pos()+rayVector, [self], 1)
+			var intersectResult = physWorld.intersect_ray(get_global_pos(), observed.get_global_pos(), [self], 1)
 			oldIntersect = intersectResult
 			update()
-			if(targetLock != null && observed == targetLock): #workaround
-				target = targetLock
 			if(intersectResult.has("collider") and intersectResult["collider"] == observed):
 				target = observed
 				lastTargetPos = target.get_global_pos()
-				targetLock = target #workaround
 				break
-				
-	if(target == null):
-		targetLock = null #workaround
 		
-	#if(target != null):
-	#	lastTargetPos = target.get_global_pos()
 	
 	if target != null:
 		set_rot(get_global_pos().angle_to_point(target.get_global_pos()) - get_owner().get_rot())

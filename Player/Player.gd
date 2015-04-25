@@ -75,6 +75,7 @@ func _fixed_process(delta):
 		teleportCooldownCurrent -= delta
 		if(teleportCooldownCurrent > 0):
 			get_node("TeleportSpark").set_emitting(true)
+			get_node("TeleportSpark").set_param(Particles2D.PARAM_INITIAL_ANGLE, get_rot())
 		else:
 			get_node("TeleportSpark").set_emitting(false)
 	#hacking
