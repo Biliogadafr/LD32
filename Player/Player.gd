@@ -64,8 +64,7 @@ func _fixed_process(delta):
 		var space = get_world_2d().get_space()
 		var space_state = Physics2DServer.space_get_direct_state( space )
 		var endPoint = get_global_pos() + teleportDirection * teleportLength    
-		#*20 is workaround... kind of... anyway don't work.
-		var intersectResult = space_state.intersect_ray(get_global_pos(),  get_global_pos() + teleportDirection * teleportLength*20, [self])
+		var intersectResult = space_state.intersect_ray(get_global_pos(),  get_global_pos() + teleportDirection * teleportLength, [self])
 		if intersectResult.has("position"):
 			var endPointCandidate = intersectResult["position"]
 			if (endPointCandidate - get_global_pos()).length() < teleportLength:
